@@ -74,16 +74,36 @@ RUN R -e 'install.packages("mlr", repos="http://cran.fiocruz.br/")' \ # mlr
 # set path:
 ENV PATH=/usr/local/bin/samtools/:$PATH
 
-# download other tools
+## Localize mosaicforecast github repo
+# git installed above
+
+# Make dir to clone git repo /home/git
+RUN mkdir /home/git && \
+    cd /home/git && \
+    git clone https://github.com/parklab/MosaicForecast.git
+
+# copy scripts to opt
+RUN cp /home/git/MosaicForecast/*py /opt/
+RUN cp /home/git/MosaicForecast/*sh /opt/
+RUN cp /home/git/MosaicForecast/*R /opt/
+
+# remove /home/git
+RUN rm -rf /home/git/
+
+
+# download other tools ##FROM ORIGINAL DOCKERFILEE
 WORKDIR /usr/local/bin
-COPY downloads_docker.sh .
-RUN . downloads_docker.sh
-COPY downloads_copy.sh .
-RUN downloads_copy.sh 
+#COPY downloads_docker.sh .
+#RUN . downloads_docker.sh
+#COPY downloads_copy.sh .
+#RUN downloads_copy.sh 
+
+RUN /opt/downloads_docker.sh
+RUN /opt/downloads.sh
 
 
 # 7. wrapper
-COPY *.py *.R *.md ./
+#COPY *.py *.R *.md ./
 RUN chmod +x *py && chmod +x *.R
 RUN mv hg19/k24.umap.wg.bw ./
 RUN rm -r hg19/
