@@ -74,6 +74,7 @@ RUN R -e 'install.packages("mlr", repos="http://cran.fiocruz.br/")' \ # mlr
 # set path:
 ENV PATH=/usr/local/bin/samtools/:$PATH
 
+##############################################################
 ## Localize mosaicforecast github repo
 # git installed above
 
@@ -89,6 +90,7 @@ RUN cp /home/git/MosaicForecast/*R /opt/
 
 # remove /home/git
 RUN rm -rf /home/git/
+############################################################
 
 
 # download other tools ##FROM ORIGINAL DOCKERFILEE

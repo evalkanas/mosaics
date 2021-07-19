@@ -24,4 +24,5 @@ cat <(zcat $mutect_vcf |grep -v '^#'| grep -v panel | grep -v PON | grep -v str_
 
 # rule MAF0_extraction_INS
 
+# rule MAF0_extraction_DEL
 
