@@ -23,115 +23,67 @@ workflow runMF {
     Array[String] input_samples
     Array[File] mutect_vcfs
     Array[File] mutect_vcf_indexes
-    Array[File] bam_or_crams
-    Array[File] bam_or_cram_indexes
+    Array[File] bam_or_crams # dir containing sample BAM/CRAM and idex file 
+    Array[File]? bam_or_cram_indexes
 
-    File mutect_vcf
 		String mf_docker
-		#load the git repo into the docker
-		File cram_dir
     
 
 		File ref_fasta
 		File ref_bigwig
-		String seq_format #bam or cram
-		#File input_positions #output of Mutect converted to work with mf 
-		File mutect_bed_snv
-		File mutect_bed_ins
-		File mutect_bed_del
-		String output_location #need to eventually change this so it will work with sample name somehow otherwise will get overwritten
-		File rf_del # DEL random forest model
-		File rf_ins # INS random forest model
-		File rf_snv # SNV random forest model
+		String seq_format #bam or cram 
+		File rf_model #random forest model
 		Int n_threads # 2 to start
 		Int min_snp_dp # 20 to start
 		String predict_model
+    String all_predictions #name of output file with genotype predictions
 	}
 
-
-	output {
-	  File 
-
-	}
-
-    call read_features as SNVfeatures {
+  scatter (i in range(length(mutect_vcfs)))) {
+    call mutect2mf {
       input:
-      file_in = mutect_bed_snv
-      bam_dir = cram_dir #input directory for the sample BAM/CRAM and index files
+      file_in = mutect_vcfs[i]
+      sample_id = input_samples[i]
+      mf_docker = mf_docker
+    }
+
+    call read_features {
+      input:
+      file_in = mutect2mf.sample_mutect_bed #do I need to index to the proper sample here? [i]
+      bam_dir = bam_or_crams[i] #input directory for the sample BAM/CRAM and index files
       ref_fasta = ref_fasta
       ref_bigwig = ref_bigwig
       n_threads = n_threads
       format = seq_format #bam or cram
       mf_docker = mf_docker
     }
+  }
 
-    call read_features as INSfeatures {
-      input:
-      file_in = mutect_bed_ins
-      bam_dir = cram_dir #input directory for the sample BAM/CRAM and index files
-      ref_fasta = ref_fasta
-      ref_bigwig = ref_bigwig
-      n_threads = n_threads
-      format = seq_format #bam or cram
-      mf_docker = mf_docker
-    }
+    #combine read features results for all samples
 
-    call read_features as DELfeatures {
-      input:
-      file_in = mutect_bed_del
-      bam_dir = cram_dir #input directory for the sample BAM/CRAM and index files
-      ref_fasta = ref_fasta
-      ref_bigwig = ref_bigwig
-      n_threads = n_threads
-      format = seq_format #bam or cram
-      mf_docker = mf_docker
-    }
+  call gather_features {
 
-    call geno_predictions as SNVpredict {
-      input:
-      file_in = SNVfeatures.features_out
-      model = rf_snv
-      mf_docker = mf_docker
-      model_type = predict_model
-    }
+    input: 
+    feature_files = read_features.features_out
 
-    call geno_predictions as DELpredict {
-      input:
-      file_in = DELfeatures.features_out
-      model = rf_del
-      mf_docker = mf_docker
-      model_type = predict_model
-    }
+  }
 
-    call geno_predictions as INSpredict {
-      input:
-      file_in = INSfeatures.features_out
-      model = rf_ins
-      mf_docker = mf_docker
-      model_type = predict_model
-	}
-
-#TODO: work on what I want to phase
-
-    call phasing {
-      input: 
-      bam_dir = cram_dir
-      dir_out = output_location
-      file_in = input_positions
-      ref_fasta = ref_fasta
-      ref_bigwig = ref_bigwig
-      n_threads = n_threads #2
-      min_snp_dp = min_snp_dp #20
-      format = seq_format
-	}
+  call geno_predictions {
+    input:
+    file_in = gather_features.all_features
+    model = rds
+    mf_docker = mf_docker
+    model_type = predict_model
+    predictions_name = all_predictions
+  }
 
   output {
-  	#output of whole workflow
+  	File final_predictions = geno_predictions.predictions_name
   }
 
 }
 
-task phasing {
+task phasing { #not using 
   input {
 
     File bam_dir
@@ -222,7 +174,7 @@ task read_features {
   RuntimeAttr runtime_attr = select_first([runtime_attr_override, default_attr])
 
   output {
-    File features_out 
+    File features_out = sample_id + ".features"
 
   }
 
@@ -256,6 +208,7 @@ task geno_predictions {
   	File model
   	String model_type #Phase or Refine
     String mf_docker
+    String predictions_name
     RuntimeAttr? runtime_attr_override
   }
 
@@ -274,7 +227,7 @@ task geno_predictions {
   RuntimeAttr runtime_attr = select_first([runtime_attr_override, default_attr])
 
   output {
-  	File predictions_out
+  	File predictions_out = predictions_name
 
   }
 
@@ -334,11 +287,13 @@ task mutect2mf {
 
   command <<<
   set -euo pipefail
+   
+  # TODO add Mutect_to_MF to Dockerfile
 
-  bash /opt/Mutect_to_MF.sh \
+  bash /opt/Mutect_to_MF.sh \ 
     ~{file_in} \ #Mutect VCF output
     ~{sample_id} \
-    ~{sample_mutect_bed_name}\ #Phase or Refine
+    ~{sample_mutect_bed_name}\ #Output file name
 
   >>>
   runtime {
@@ -351,6 +306,20 @@ task mutect2mf {
     maxRetries: select_first([runtime_attr.max_retries, default_attr.max_retries])
   }
 
+# TODO add task gather per sample
 
+task gather_features {
 
+  Array[File] feature_files
 
+  command <<<
+
+  #combine individual sample features file into one large file 
+  cat <(cat ~{feature_files}|grep '^id' |head -1)  <(cat ~{feature_files}|grep -v '^id') > {output}
+
+  >>>
+
+  output {
+    File all_features = "allsamples.features"
+  }
+}
