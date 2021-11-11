@@ -7,13 +7,11 @@
 
 version 1.0
 
-# TODO: do I need the Structs wdl to run in Terra?
-# import "Structs.wdl"
+import "Structs.wdl"
 
 
-workflow runMF {
-
-	 meta {
+workflow runMosaicForecast {
+  meta {
     author: "Elise Valkanas"
     email: "valkanas@broadinstitute.org"
   }
@@ -42,20 +40,21 @@ workflow runMF {
   scatter (i in range(length(mutect_vcfs)))) {
     call mutect2mf {
       input:
-      file_in = mutect_vcfs[i]
-      sample_id = input_samples[i]
-      mf_docker = mf_docker
+        file_in = mutect_vcfs[i],
+        sample_id = input_samples[i],
+        mf_docker = mf_docker
     }
 
     call read_features {
       input:
-      file_in = mutect2mf.sample_mutect_bed #do I need to index to the proper sample here? [i]
-      bam_dir = bam_or_crams[i] #input directory for the sample BAM/CRAM and index files
-      ref_fasta = ref_fasta
-      ref_bigwig = ref_bigwig
-      n_threads = n_threads
-      format = seq_format #bam or cram
-      mf_docker = mf_docker
+        file_in = mutect2mf.sample_mutect_bed, 
+        bam_dir = bam_or_crams[i], #input directory for the sample BAM/CRAM and index files
+        ref_fasta = ref_fasta,
+        ref_bigwig = ref_bigwig,
+        n_threads = n_threads,
+        format = seq_format, #bam or cram
+        mf_docker = mf_docker,
+        sample_id = input_samples[i]
     }
   }
 
@@ -64,21 +63,21 @@ workflow runMF {
   call gather_features {
 
     input: 
-    feature_files = read_features.features_out
+      feature_files = read_features.features_out
 
   }
 
   call geno_predictions {
     input:
-    file_in = gather_features.all_features
-    model = rds
-    mf_docker = mf_docker
-    model_type = predict_model
-    predictions_name = all_predictions
+      file_in = gather_features.all_features,
+      model = rf_model,
+      mf_docker = mf_docker,
+      model_type = predict_model,
+      predictions_name = all_predictions
   }
 
   output {
-  	File final_predictions = geno_predictions.predictions_name
+  	File final_predictions = geno_predictions.predictions_out
   }
 
 }
@@ -156,6 +155,7 @@ task read_features {
     Int n_threads
     String format #bam or cram
     String mf_docker
+    String sample_id 
     RuntimeAttr? runtime_attr_override
   }
 
@@ -238,7 +238,7 @@ task geno_predictions {
 	  ~{file_in} \ #SNV or INS or DEL features file from extract read level features
 	  ~{model} \
 	  ~{model_type}\ #Phase or Refine
- 	  ~{predictions_out} \
+ 	  ~{predictions_out} 
 
   >>>
   runtime {
@@ -290,10 +290,10 @@ task mutect2mf {
    
   # TODO add Mutect_to_MF to Dockerfile
 
-  bash /opt/Mutect_to_MF.sh \ 
+  bash /opt/mutect_to_mosaic_forecast.sh \ 
     ~{file_in} \ #Mutect VCF output
     ~{sample_id} \
-    ~{sample_mutect_bed_name}\ #Output file name
+    ~{sample_mutect_bed_name} #Output file name
 
   >>>
   runtime {
@@ -309,10 +309,12 @@ task mutect2mf {
 # TODO add task gather per sample
 
 task gather_features {
-
-  Array[File] feature_files
+  input {
+    Array[File] feature_files
+  }
 
   command <<<
+  set -euo pipefail
 
   #combine individual sample features file into one large file 
   cat <(cat ~{feature_files}|grep '^id' |head -1)  <(cat ~{feature_files}|grep -v '^id') > {output}
