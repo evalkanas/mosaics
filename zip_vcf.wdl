@@ -43,15 +43,12 @@ task ZipVcf {
     String gatk_docker
     RuntimeAttr? runtime_attr_override
   }
-
-  Int num_cpu = 1
-  Int mem_size_gb = 4
-  Int vm_disk_size = 50
+  
 
   RuntimeAttr default_attr = object { 
-    cpu_cores: num_cpu, 
-    mem_gb: mem_size_gb, 
-    disk_gb: vm_disk_size,
+    cpu_cores: 1, 
+    mem_gb: 4, 
+    disk_gb: 50,
     boot_disk_gb: 10,
     preemptible_tries: 3,
     max_retries: 1
