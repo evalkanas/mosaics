@@ -70,7 +70,7 @@ task ZipVcf {
     export GCS_OAUTH_TOKEN=`gcloud auth application-default print-access-token`
 
     bgzip ~{file_in} > ~{vcf_out}
-    tabix -p ~{vcf_out} 
+    tabix -p vcf ~{vcf_out} 
   >>>
   runtime {
     docker: docker
