@@ -1,6 +1,5 @@
 {
   "CompressVcf.gatk_docker": "String",
   "CompressVcf.vcf_in": "File",
-  "CompressVcf.ZipVcf.runtime_attr_override": "WomCompositeType {\n cpu_cores -> Int?\nmax_retries -> Int?\nboot_disk_gb -> Int?\ndisk_gb -> Int?\nmem_gb -> Float?\npreemptible_tries -> Int? \n}? (optional)"
 }
 
