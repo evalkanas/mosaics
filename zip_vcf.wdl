@@ -24,13 +24,13 @@ workflow CompressVcf {
 
   call ZipVcf {
     input:
-      file_in = vcf_in,
-      docker = gatk_docker
+      vcf_in = vcf_in,
+      gatk_docker = gatk_docker
   }
 
   output {
-  	File vcf_out = ZipVcf.vcf_out
-    File vcf_out_index = ZipVcf.vcf_out_index
+  	File zip_vcf = ZipVcf.vcf_out
+    File zip_vcf_index = ZipVcf.vcf_out_index
   }
 
 }
@@ -39,8 +39,8 @@ workflow CompressVcf {
 task ZipVcf {
 
   input {
-    File file_in
-    String docker
+    File vcf_in
+    String gatk_docker
     RuntimeAttr? runtime_attr_override
   }
 
@@ -59,8 +59,8 @@ task ZipVcf {
   RuntimeAttr runtime_attr = select_first([runtime_attr_override, default_attr])
 
   output {
-    File vcf_out = file_in + ".gz"
-    File vcf_out_index = file_in + ".gz.tbi"
+    File vcf_out = vcf_in + ".gz"
+    File vcf_out_index = vcf_in + ".gz.tbi"
 
   }
 
@@ -69,11 +69,11 @@ task ZipVcf {
 
     export GCS_OAUTH_TOKEN=`gcloud auth application-default print-access-token`
 
-    bgzip ~{file_in} > ~{vcf_out}
+    bgzip ~{vcf_in} > ~{vcf_out}
     tabix -p vcf ~{vcf_out} 
   >>>
   runtime {
-    docker: docker
+    docker: gatk_docker
     cpu: select_first([runtime_attr.cpu_cores, default_attr.cpu_cores])
     memory: select_first([runtime_attr.mem_gb, default_attr.mem_gb]) + " GiB"
     disks: "local-disk " + select_first([runtime_attr.disk_gb, default_attr.disk_gb]) + " HDD"

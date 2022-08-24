@@ -1,5 +1,5 @@
 {
-  "CompressVcf.gatk_docker": "String",
-  "CompressVcf.vcf_in": "File",
+  "CompressVcf.gatk_docker": "us.gcr.io/broad-gatk/gatk:4.2.6.1",
+  "CompressVcf.vcf_in": "gs://fc-0e8b9bf4-7749-4228-9bd5-4cdb2b81d3b3/submissions/04d7e19f-6910-45b8-b101-29adb7e13b86/Mutect2/79940ead-7719-450a-9911-3d404fd2918c/call-Filter/filtered.vcf"
 }
 
