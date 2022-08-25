@@ -19,10 +19,12 @@ workflow CompressVcf {
 	}
 
 
+  String prefix = basename(vcf_in, ".vcf")
   call ZipVcf {
     input:
       vcf_in = vcf_in,
-      gatk_docker = gatk_docker
+      gatk_docker = gatk_docker,
+      prefix = prefix
   }
 
   output {
@@ -38,12 +40,12 @@ task ZipVcf {
   input {
     File vcf_in
     String gatk_docker
+    String prefix
   }
   
   output {
-    File vcf_out = basename(vcf_in) + ".gz"
-    File vcf_out_index = basename(vcf_in) + ".gz.tbi"
-
+    File vcf_out = "~{prefix}.vcf.gz"
+    File vcf_out_index = "~{prefix}.vcf.gz.tbi"
   }
 
   command <<<
@@ -51,14 +53,16 @@ task ZipVcf {
 
     export GCS_OAUTH_TOKEN=`gcloud auth application-default print-access-token`
 
-    bgzip ~{vcf_in} > ~{vcf_out}
-    tabix -p vcf ~{vcf_out} 
+    bcftools view ~{vcf_in} -O z -o ~{prefix}.vcf.gz
+    tabix -p vcf ~{prefix}.vcf.gz
+
   >>>
+
   runtime {
     docker: gatk_docker
     cpu: 1
-    memory: "10 GiB"
-    disks: "local-disk 30 HDD" 
+    memory: "8 GiB"
+    disks: "local-disk 40 HDD" 
     bootDiskSizeGb: 20
     preemptible: 3
     maxRetries: 1
