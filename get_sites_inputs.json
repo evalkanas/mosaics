@@ -1,0 +1,6 @@
+{
+  "MutectSites.gatk_docker": "String",
+  "MutectSites.sample_id": "String",
+  "MutectSites.vcf_in": "File"
+}
+
