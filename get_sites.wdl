@@ -51,27 +51,27 @@ task GetSites {
     set -euo pipefail
 
     export GCS_OAUTH_TOKEN=`gcloud auth application-default print-access-token`
-    bcftools query -f "%CHROM\t%POS\t%REF\t%ALT\t%FILTER\t[%AD\t%AF]\n" ~{vcf_in} > ~{sample_id}.txt
-    #| awk -v sample_id=~{sample_id} '{print $0"\t"sample_id}' \
-    #> ~{sample_id}.txt
+    bcftools query -f "%CHROM\t%POS\t%REF\t%ALT\t%FILTER\t[%AD\t%AF]\n" ~{vcf_in} \
+    | awk -v sample_id=~{sample_id} '{print $0"\t"sample_id}' \
+    > ~{sample_id}.txt
 
     vars=$(wc -l ~{sample_id}.txt | awk '{print $1}')
     germ=$(awk '{ if ($5 == "germline") print $5}' ~{sample_id}.txt | wc -l)
-    pass=$(grep -c "PASS" ~{sample_id}.txt
+    pass=$(grep -c "PASS" ~{sample_id}.txt)
 
     filter=$(($vars-$pass-$germ))
 
     #echo number of PZM, germline, and filtered variants identified by mutect for this sample
-    echo ~{sample_id}"\t"${pass}"\t"${germ}"\t"${filter}"\n" > ~{sample_id}_summary.txt
+    echo -e ~{sample_id}"\t"${pass}"\t"${germ}"\t"${filter}"\n" > ~{sample_id}_summary.txt
 
   >>>
 
   runtime {
     docker: gatk_docker
     cpu: 1
-    memory: "8 GiB"
-    disks: "local-disk 40 HDD" 
-    bootDiskSizeGb: 20
+    memory: "2 GiB"
+    disks: "local-disk 20 HDD" 
+    bootDiskSizeGb: 10
     preemptible: 3
     maxRetries: 1
   }
