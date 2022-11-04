@@ -1,0 +1,10 @@
+{
+  "workflow_failure_mode": "ContinueWhilePossible",
+  "jes_gcs_root": "gs://ev-mutect-test",
+  "monitoring_script": "gs://gatk-sv-resources/resources/cromwell_monitoring_script2.sh",
+  "google_project": "talkowski-ev-mosaic",
+  "final_workflow_outputs_dir": "gs://ev-mutect-test", 
+  "write_to_cache": true,
+  "read_from_cache": false, 
+  "backend": "PAPIv2-vpc"
+}

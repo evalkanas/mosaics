@@ -28,8 +28,7 @@ workflow MutectSummary {
       sample_mutect_sites_files = sample_mutect_sites_files,
       sample_summary_stats_files = sample_summary_stats_files, 
       prefix = prefix, 
-      gatk_docker = gatk_docker,
-      sample_id = sample_id
+      gatk_docker = gatk_docker
   }
 
   output {
@@ -70,7 +69,7 @@ task ConcatSites {
     cpu: select_first([runtime_override.cpu_cores, runtime_default.cpu_cores])
     preemptible: select_first([runtime_override.preemptible_tries, runtime_default.preemptible_tries])
     maxRetries: select_first([runtime_override.max_retries, runtime_default.max_retries])
-    docker: sv_base_mini_docker
+    docker: gatk_docker
     bootDiskSizeGb: select_first([runtime_override.boot_disk_gb, runtime_default.boot_disk_gb])
   }
 
@@ -83,14 +82,17 @@ task ConcatSites {
     while read SPLIT; do
       cat $SPLIT
     done < ~{write_lines(sample_mutect_sites_files)} \
-      | awk '{print $1"\t"$2"}' \
+      | awk '{print $1"\t"$2}' \
       | sort -u \
       > ~{output_sites_file}
 
+    echo -e "SAMPLE\tPZM\tGERMLINE\tFILTERED" > ~{output_summ_file} 
+
     while read SAMP; do
-      cat $SAMP 
+      head -n 1 $SAMP
+#      cat $SAMP 
     done < ~{write_lines(sample_summary_stats_files)} \
-    > ~{output_summ_file} 
+    >> ~{output_summ_file} 
 
   >>>
 
