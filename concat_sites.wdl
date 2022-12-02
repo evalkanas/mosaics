@@ -86,7 +86,7 @@ task ConcatSites {
       | sort -u \
       > ~{output_sites_file}
 
-    echo -e "SAMPLE\tPZM\tGERMLINE\tFILTERED" > ~{output_summ_file} 
+    echo -e "SAMPLE\tPZM\tGERMLINE\tFILTERED\tANY_WEAK_EVIDENCE\tWEAK_EVIDENCE_ONLY\tWEAK_EVIDENCE_AND_OTHER" > ~{output_summ_file} 
 
     while read SAMP; do
       head -n 1 $SAMP
