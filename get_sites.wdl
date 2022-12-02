@@ -58,6 +58,17 @@ task GetSites {
     vars=$(wc -l ~{sample_id}.txt | awk '{print $1}')
     germ=$(awk '{ if ($5 == "germline") print $5}' ~{sample_id}.txt | wc -l)
     pass=$(grep -c "PASS" ~{sample_id}.txt)
+    #any variant with weak evidence 
+    we_any=$(grep -c  'weak_evidence' ~{sample_id}.txt)
+
+    #weak evidence only 
+    we_only=$(awk '{ if ($5 == "weak_evidence") print $5}' ~{sample_id}.txt | wc -l)
+
+    #weak evidence and one other filter
+    we_and_other=$(expr $we_any - $we_only)
+
+    
+
 
     filter=$(($vars-$pass-$germ))
 
