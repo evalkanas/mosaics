@@ -73,7 +73,7 @@ task GetSites {
     filter=$(($vars-$pass-$germ))
 
     #echo number of PZM, germline, and filtered variants identified by mutect for this sample
-    echo -e ~{sample_id}"\t"${pass}"\t"${germ}"\t"${filter}"\n" > ~{sample_id}_summary.txt
+    echo -e ~{sample_id}"\t"${pass}"\t"${germ}"\t"${filter}"\t${$we_any}\t${$we_only}\t${$we_and_other}" > ~{sample_id}_summary.txt
 
   >>>
 
