@@ -1,6 +1,6 @@
 {
   "MutectSites.gatk_docker": "us.gcr.io/broad-dsde-methods/gatk-sv/sv-pipeline:2022-08-08-v0.24-beta-79d76bc9",
-  "MutectSites.sample_id": "SS0012986",
-  "MutectSites.vcf_in": "gs://ev-mutect-test/SS0012986.final-filtered.vcf.gz "
+  "MutectSites.sample_id": "SS0012989",
+  "MutectSites.vcf_in": "gs://ev-mutect-test/SS0012989.final-filtered.vcf.gz"
 }
 
