@@ -58,6 +58,7 @@ task GetSites {
     vars=$(wc -l ~{sample_id}.txt | awk '{print $1}')
     germ=$(awk '{ if ($5 == "germline") print $5}' ~{sample_id}.txt | wc -l)
     pass=$(grep -c "PASS" ~{sample_id}.txt)
+
     #any variant with weak evidence 
     we_any=$(grep -c  'weak_evidence' ~{sample_id}.txt)
 
@@ -65,15 +66,17 @@ task GetSites {
     we_only=$(awk '{ if ($5 == "weak_evidence") print $5}' ~{sample_id}.txt | wc -l)
 
     #weak evidence and one other filter
-    we_and_other=$(expr $we_any - $we_only)
+    we_and_other=$(($we_any-$we_only))
+    weak=$(echo $we_any"\t"$we_only"\t"$we_and_other)
 
     
 
 
     filter=$(($vars-$pass-$germ))
 
-    #echo number of PZM, germline, and filtered variants identified by mutect for this sample
-    echo -e ~{sample_id}"\t"${pass}"\t"${germ}"\t"${filter}"\t${$we_any}\t${$we_only}\t${$we_and_other}" > ~{sample_id}_summary.txt
+    #number of PZM, germline, filtered, all with weak evidence, weak evidence only, and weak evidence + one other filter 
+    #variants identified by mutect for this sample
+    echo -e ~{sample_id}"\t"${pass}"\t"${germ}"\t"${filter}"\t"$weak > ~{sample_id}_summary.txt
 
   >>>
 
