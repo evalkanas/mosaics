@@ -1,0 +1,7 @@
+{
+  "MutectSummary.sample_summary_stats_files": ["gs://fc-0e8b9bf4-7749-4228-9bd5-4cdb2b81d3b3/submissions/c3895a69-c7cf-4cd5-a5b2-d2f4a7d9e137/MutectSites/755893d2-bde7-4d50-a4d1-e0fef2d78bf1/call-GetSites/cacheCopy/SS0012986_summary.txt", "gs://fc-0e8b9bf4-7749-4228-9bd5-4cdb2b81d3b3/submissions/c3895a69-c7cf-4cd5-a5b2-d2f4a7d9e137/MutectSites/4c9d30cc-107d-4115-ae50-7358ee7b709d/call-GetSites/SS0012989_summary.txt"],
+  "MutectSummary.gatk_docker": "us.gcr.io/broad-dsde-methods/gatk-sv/sv-pipeline:2022-08-08-v0.24-beta-79d76bc9",
+  "MutectSummary.prefix": "Mutect_SS0012986_SS0012989_",
+  "MutectSummary.sample_mutect_sites_files": ["gs://fc-0e8b9bf4-7749-4228-9bd5-4cdb2b81d3b3/submissions/c3895a69-c7cf-4cd5-a5b2-d2f4a7d9e137/MutectSites/755893d2-bde7-4d50-a4d1-e0fef2d78bf1/call-GetSites/cacheCopy/SS0012986.txt","gs://fc-0e8b9bf4-7749-4228-9bd5-4cdb2b81d3b3/submissions/c3895a69-c7cf-4cd5-a5b2-d2f4a7d9e137/MutectSites/4c9d30cc-107d-4115-ae50-7358ee7b709d/call-GetSites/SS0012989.txt"]
+}
+
