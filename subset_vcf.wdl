@@ -16,7 +16,7 @@ workflow SubsetSites {
   input {
     File vcf_in
     File vcf_idx
-		String gatk_docker
+    String gatk_docker
     String sample_id
     File bed
     String prefix
@@ -33,7 +33,7 @@ workflow SubsetSites {
   }
 
   output {
-  	File bed_filtered_vcf = GetSites.vcf_out
+    File bed_filtered_vcf = GetSites.vcf_out
     File bed_filtered_idx = GetSites.vcf_index
   }
 
@@ -60,8 +60,8 @@ task GetSites {
     set -euo pipefail
 
     export GCS_OAUTH_TOKEN=`gcloud auth application-default print-access-token`
-    #bcftools view -R ~{bed} ~{vcf_in} -Oz -o ~{sample_id}_~{prefix}.vcf.gz
-    tabix -h -R ~{bed} ~{vcf_in} | bgzip > ~{sample_id}_~{prefix}.vcf.gz
+    bcftools view -R ~{bed} ~{vcf_in} -Oz -o ~{sample_id}_~{prefix}.vcf.gz
+    #tabix -h -R ~{bed} ~{vcf_in} | bgzip > ~{sample_id}_~{prefix}.vcf.gz
     tabix -p vcf ~{sample_id}_~{prefix}.vcf.gz
 
   >>>

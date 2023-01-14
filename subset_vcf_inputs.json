@@ -1,8 +1,8 @@
 {
-  "SubsetSites.vcf_in": "gs://fc-0e8b9bf4-7749-4228-9bd5-4cdb2b81d3b3/submissions/bb37897b-2a22-4f75-9dd5-3477b1e7f34e/CompressVcf/1cc73ecf-905b-43ce-80ff-de76e81cae7c/call-ZipVcf/SS0012986.final-filtered.vcf.gz",
-  "SubsetSites.vcf_idx": "gs://fc-0e8b9bf4-7749-4228-9bd5-4cdb2b81d3b3/submissions/bb37897b-2a22-4f75-9dd5-3477b1e7f34e/CompressVcf/1cc73ecf-905b-43ce-80ff-de76e81cae7c/call-ZipVcf/SS0012986.final-filtered.vcf.gz.tbi",
+  "SubsetSites.vcf_in": "gs://fc-0e8b9bf4-7749-4228-9bd5-4cdb2b81d3b3/submissions/bb37897b-2a22-4f75-9dd5-3477b1e7f34e/CompressVcf/ca9d4814-d078-4a21-b834-09e921fafb5a/call-ZipVcf/SS0012989.final-filtered.vcf.gz",
+  "SubsetSites.vcf_idx": "gs://fc-0e8b9bf4-7749-4228-9bd5-4cdb2b81d3b3/submissions/bb37897b-2a22-4f75-9dd5-3477b1e7f34e/CompressVcf/ca9d4814-d078-4a21-b834-09e921fafb5a/call-ZipVcf/SS0012989.final-filtered.vcf.gz.tbi",
   "SubsetSites.gatk_docker": "us.gcr.io/broad-dsde-methods/gatk-sv/sv-pipeline:2022-08-08-v0.24-beta-79d76bc9",
-  "SubsetSites.sample_id": "SS0012986",
+  "SubsetSites.sample_id": "SS0012989",
   "SubsetSites.bed": "gs://ev-resources/hg38_primary_noRM_noSD_noSR.bed",
   "SubsetSites.prefix": "no_repeats"
 }

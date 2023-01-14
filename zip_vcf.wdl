@@ -15,7 +15,7 @@ workflow CompressVcf {
 
   input {
     File vcf_in
-		String gatk_docker
+    String gatk_docker
 	}
 
 
@@ -28,7 +28,7 @@ workflow CompressVcf {
   }
 
   output {
-  	File zip_vcf = ZipVcf.vcf_out
+    File zip_vcf = ZipVcf.vcf_out
     File zip_vcf_index = ZipVcf.vcf_out_index
   }
 
@@ -53,7 +53,7 @@ task ZipVcf {
 
     export GCS_OAUTH_TOKEN=`gcloud auth application-default print-access-token`
 
-    bcftools view ~{vcf_in} -O z -o ~{prefix}.vcf.gz
+    bcftools sort ~{vcf_in} -O z -o ~{prefix}.vcf.gz
     tabix -p vcf ~{prefix}.vcf.gz
 
   >>>
