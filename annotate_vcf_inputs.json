@@ -1,0 +1,13 @@
+{
+  "AnnoSites.gc_bed_idx": "gs://ev-resources/hg38_gc_percent.bed.gz.tbi",
+  "AnnoSites.gc_bed": "gs://ev-resources/hg38_gc_percent.bed.gz",
+  "AnnoSites.sample_id": "SS0012986",
+  "AnnoSites.vcf_in": "gs://fc-0e8b9bf4-7749-4228-9bd5-4cdb2b81d3b3/c12aba34-04d8-40cf-990b-e8055b6ef857/Mutect2/53316318-d26b-42d7-98b7-8a417f44c147/call-Funcotate/SS0012986.final-filtered.annotated.vcf.gz",
+  "AnnoSites.vcf_idx": "gs://fc-0e8b9bf4-7749-4228-9bd5-4cdb2b81d3b3/c12aba34-04d8-40cf-990b-e8055b6ef857/Mutect2/53316318-d26b-42d7-98b7-8a417f44c147/call-Funcotate/SS0012986.final-filtered.annotated.vcf.gz.tbi",
+  "AnnoSites.gatk_docker": "us.gcr.io/broad-dsde-methods/gatk-sv/sv-pipeline:2022-08-08-v0.24-beta-79d76bc9",
+  "AnnoSites.bed": "gs://ev-resources/hg38-RepeatMasker_slim.bed.gz",
+  "AnnoSites.bed_idx": "gs://ev-resources/hg38-RepeatMasker_slim.bed.gz.tbi",
+  "AnnoSites.prefix": "rm_gc",
+  "AnnoSites.bed_header": "gs://ev-mutect-test/gc_rm_header.txt"
+}
+

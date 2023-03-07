@@ -81,9 +81,9 @@ task Anno {
     #annotate with bed file 
     #bcftools view -R ~{bed} ~{vcf_in} -Oz -o ~{sample_id}_~{prefix}.vcf.gz
     bcftools annotate -a ~{bed} -c CHROM,FROM,TO,RMNM,RMCL,RMFAM -h ~{bed_header} -l RMNM:append,RMCL:append,RMFAM:append \
-    ~{vcf_in} -Oz -o ~{sample_id}_rm.vcf.gz | bcftools annotate -a {gc_bed}
+    ~{vcf_in} -Oz -o ~{sample_id}_rm.vcf.gz #| bcftools annotate -a ~{gc_bed}
 
-    bcftools annotate -a {gc_bed} -c CHROM,FROM,TO,GC  -l GC:append \
+    bcftools annotate -a ~{gc_bed} -c CHROM,FROM,TO,GC  -l GC:append \
     ~{sample_id}_rm.vcf.gz -Oz -o ~{sample_id}_~{prefix}.vcf.gz
 
     tabix -p vcf ~{sample_id}_~{prefix}.vcf.gz
