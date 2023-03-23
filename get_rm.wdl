@@ -55,7 +55,8 @@ task GetRM {
     | awk -v sample_id=~{sample_id} '{print $0"\t"sample_id}' \
     > ~{sample_id}.txt
 
-    cat ~{sample_id}.txt | awk '{print $9"\t"$11}' | sort | uniq -c > ~{sample_id}_summary.txt
+    echo -e "Pass_vars\tRMCL\tSAMPLE_ID" >> ~{sample_id}_summary.txt
+    cat ~{sample_id}.txt | awk '{print $9"\t"$11}' | sort | uniq -c | awk '{print $1"\t"$2"\t"$3}' >> ~{sample_id}_summary.txt
 
   >>>
 
