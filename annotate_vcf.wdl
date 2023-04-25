@@ -24,6 +24,14 @@ workflow AnnoSites {
     File gc_bed_idx
     String prefix
     File bed_header #header with info for both bed files to add to output VCF
+    File lcr
+    File wes
+    File pass_af
+    File pass_af_idx
+    File all_af
+    File all_af_idx
+    File simplerepeat
+    File segdup
 	}
 
   call Anno {
@@ -37,7 +45,15 @@ workflow AnnoSites {
       bed_idx = bed_idx,
       bed_header = bed_header,
       gc_bed = gc_bed, 
-      gc_bed_idx = gc_bed_idx
+      gc_bed_idx = gc_bed_idx, 
+      lcr = lcr,
+      wes = wes,
+      pass_af = pass_af,
+      pass_af_idx =pass_af_idx,
+      all_af = all_af,
+      all_af_idx = all_af_idx,
+      simplerepeat = simplerepeat, 
+      segdup = segdup
   }
 
   output {
@@ -64,6 +80,14 @@ task Anno {
     File gc_bed_idx
     String prefix
     File bed_header
+    File lcr
+    File wes
+    File pass_af
+    File pass_af_idx
+    File all_af
+    File all_af_idx
+    File simplerepeat
+    File segdup
   }
   
   output {
@@ -80,18 +104,43 @@ task Anno {
 
     #annotate with bed file 
     #bcftools view -R ~{bed} ~{vcf_in} -Oz -o ~{sample_id}_~{prefix}.vcf.gz
-    bcftools annotate -a ~{bed} -c CHROM,FROM,TO,RMNM,RMCL,RMFAM -h ~{bed_header} -l RMNM:append,RMCL:append,RMFAM:append \
-    ~{vcf_in} -Oz -o ~{sample_id}_rm.vcf.gz #| bcftools annotate -a ~{gc_bed}
-
-    bcftools annotate -a ~{gc_bed} -c CHROM,FROM,TO,GC  -l GC:append \
-    ~{sample_id}_rm.vcf.gz -Oz -o ~{sample_id}_~{prefix}.vcf.gz
+    bcftools annotate \
+      -a ~{bed} \
+      -c CHROM,FROM,TO,RMNM,RMCL,RMFAM \
+      -h ~{bed_header} \
+      -l RMNM:append,RMCL:append,RMFAM:append \
+      ~{vcf_in} -Ou \
+        | bcftools annotate \
+        -a ~{gc_bed} \
+        -c CHROM,FROM,TO,GC  \
+        -l GC:append -Ou \
+          | bcftools annotate -a ~{wes} \
+          -c CHROM,FROM,TO,-,-,- -m +WESREG \
+          | bcftools annotate -a ~{simplerepeat} \
+          -c CHROM,FROM,TO,-,-,- -m +SIMPLEREP \
+          | bcftools annotate -a ~{segdup} \
+          -c CHROM,FROM,TO,-,-,- -m +SEGDUP \
+          | bcftools annotate -a ~{lcr} \
+          -c CHROM,FROM,TO,-,-,- -m +LCR \
+          | bcftools annotate -a ~{all_af} \
+          -c CHROM,POS,REF,ALT,all_cohort_af,cohort_n \
+          | bcftools annotate -a ~{pass_af} \
+          -c CHROM,POS,REF,ALT,pass_cohort_af \
+          -Oz -o ~{sample_id}_~{prefix}.vcf.gz
 
     tabix -p vcf ~{sample_id}_~{prefix}.vcf.gz
 
     #filter to pass variants
-    bcftools view -f PASS ~{sample_id}_~{prefix}.vcf.gz -Oz -o ~{sample_id}_~{prefix}_pass.vcf.gz
+    bcftools view -f PASS ~{sample_id}_~{prefix}.vcf.gz -Oz -o ~{sample_id}_~{prefix}_pre_pass.vcf.gz
+    tabix -p vcf ~{sample_id}_~{prefix}_pre_pass.vcf.gz
+
+    #remove mnp and large indels 
+    bcftools filter -e 'strlen(REF)==2 && strlen(ALT)==2' ~{sample_id}_~{prefix}_pre_pass.vcf.gz\
+    | bcftools filter -e 'strlen(REF)>50'\
+    | bcftools filter -e 'strlen(ALT)>50'  -Oz -o ~{sample_id}_~{prefix}_pass.vcf.gz
 
     tabix -p vcf ~{sample_id}_~{prefix}_pass.vcf.gz
+ 
 
   >>>
 
