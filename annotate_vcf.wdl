@@ -123,9 +123,9 @@ task Anno {
           | bcftools annotate -a ~{lcr} \
           -c CHROM,FROM,TO,-,-,- -m +LCR \
           | bcftools annotate -a ~{all_af} \
-          -c CHROM,POS,REF,ALT,all_cohort_af,cohort_n \
+          -c CHROM,POS,REF,ALT,all_cohort_ac,all_cohort_af,cohort_n \
           | bcftools annotate -a ~{pass_af} \
-          -c CHROM,POS,REF,ALT,pass_cohort_af \
+          -c CHROM,POS,REF,ALT,pass_cohort_ac,pass_cohort_af \
           -Oz -o ~{sample_id}_~{prefix}.vcf.gz
 
     tabix -p vcf ~{sample_id}_~{prefix}.vcf.gz
