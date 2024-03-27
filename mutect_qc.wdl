@@ -7,7 +7,7 @@
 
 version 1.0
 
-workflow AnnoSites {
+workflow CountSites {
   meta {
     author: "Elise Valkanas"
     email: "valkanas@broadinstitute.org"
@@ -54,7 +54,7 @@ task Qc {
     File pass_vcf = "~{sample_id}_~{prefix}_pass.vcf.gz"
     File pass_vcf_index = "~{sample_id}_~{prefix}_pass.vcf.gz.tbi"
     File pass_stats = "~{sample_id}_~{prefix}_pass_stats.txt"
-    String status = status
+    String status = "pstatus"
   }
 
   command <<<
@@ -71,11 +71,11 @@ task Qc {
     bcftools index -s ~{sample_id}_~{prefix}_pass.vcf.gz | awk '{print $1"\t"$3}' >> ~{sample_id}_~{prefix}_pass_stats.txt
 
     #check if any chr has zero variants 
-    status = "Complete"
+    pstatus = "Complete"
     #if any line has 0 variants, status = "Missing"
     while read chr, vars
     do if [[ $chr==0 ]]
-    then status="Missing"
+    then pstatus="Missing"
     fi
     done < ~{sample_id}_~{prefix}_pass_stats.txt
 
