@@ -54,7 +54,7 @@ task Qc {
     File pass_vcf = "~{sample_id}_~{prefix}_pass.vcf.gz"
     File pass_vcf_index = "~{sample_id}_~{prefix}_pass.vcf.gz.tbi"
     File pass_stats = "~{sample_id}_~{prefix}_pass_stats.txt"
-    String status = stdout()
+    String status=status
   }
 
   command <<<
@@ -75,10 +75,10 @@ task Qc {
     #if any line has 0 variants, status = "Missing"
     while read chr, vars
     do if [[ $chr==0 ]]
-    then pstatus="Missing"
+    then status="Missing"
     fi
     done < ~{sample_id}_~{prefix}_pass_stats.txt
-    echo $pstatus
+    echo $status
 
 
   >>>
