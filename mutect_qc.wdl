@@ -71,7 +71,7 @@ task Qc {
     bcftools index -s ~{sample_id}_~{prefix}_pass.vcf.gz | awk '{print $1"\t"$3}' >> ~{sample_id}_~{prefix}_pass_stats.txt
 
     #check if any chr has zero variants 
-    pstatus="Complete"
+    status="Complete"
     #if any line has 0 variants, status = "Missing"
     while read chr, vars
     do if [[ $chr==0 ]]
