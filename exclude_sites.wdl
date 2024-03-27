@@ -31,8 +31,8 @@ workflow ExcludeSites {
   }
 
   output {
-  	File mutect_sites = RemoveSites.vcf_out
-    File mutect_summary = RemoveSites.vcf_out_idx
+  	File vcf_out = RemoveSites.vcf_out
+    File vcf_out_idx = RemoveSites.vcf_out_idx
   }
 
 }
@@ -58,8 +58,8 @@ task RemoveSites {
 
     export GCS_OAUTH_TOKEN=`gcloud auth application-default print-access-token`
 
-    bcftools view -T ^exclusion_bed vcf_in -Oz -o vcf_out
-    tabix -p vcf vcf_out
+    bcftools view -T ^~{exclusion_bed} ~{vcf_in} -Oz -o ~{sample_id}_excluded.vcf.gz
+    tabix -p vcf ~{sample_id}_excluded.vcf.gz
 
 
   >>>
