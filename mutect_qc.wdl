@@ -54,7 +54,7 @@ task Qc {
     File pass_vcf = "~{sample_id}_~{prefix}_pass.vcf.gz"
     File pass_vcf_index = "~{sample_id}_~{prefix}_pass.vcf.gz.tbi"
     File pass_stats = "~{sample_id}_~{prefix}_pass_stats.txt"
-    String status = readlines(stdout())[0]
+    String status = read_lines(stdout())[0]
   }
 
   command <<<
