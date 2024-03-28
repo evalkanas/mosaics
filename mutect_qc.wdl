@@ -31,8 +31,8 @@ workflow CountSites {
   }
 
   output {
-    File pass_vcf = Qc.pass_vcf
-    File pass_vcf_idx = Qc.pass_vcf_index
+    File nomulti_vcf = Qc.nomulti_vcf
+    File nomulti_vcf_idx = Qc.nomulti_vcf_index
     File pass_stats = Qc.pass_stats
     String pass_phrase = Qc.status
   }
@@ -51,8 +51,8 @@ task Qc {
   }
   
   output {
-    File pass_vcf = "~{sample_id}_~{prefix}_pass.vcf.gz"
-    File pass_vcf_index = "~{sample_id}_~{prefix}_pass.vcf.gz.tbi"
+    File nomulti_vcf = "~{sample_id}_~{prefix}_nomulti.vcf.gz"
+    File nomulti_vcf_index = "~{sample_id}_~{prefix}_nomulti.vcf.gz.tbi"
     File pass_stats = "~{sample_id}_~{prefix}_pass_stats.txt"
     String status = read_lines(stdout())[0]
   }
@@ -70,6 +70,8 @@ task Qc {
     echo -e "chr\t~{sample_id}" > ~{sample_id}_~{prefix}_pass_stats.txt
     bcftools index -s ~{sample_id}_~{prefix}_pass.vcf.gz | awk '{print $1"\t"$3}' >> ~{sample_id}_~{prefix}_pass_stats.txt
 
+    rm ~{sample_id}_~{prefix}_pass.vcf.gz*
+
     #check if any chr has zero variants 
     status="Complete"
     #if any line has 0 variants, status = "Missing"
@@ -79,6 +81,12 @@ task Qc {
     fi
     done < ~{sample_id}_~{prefix}_pass_stats.txt
     echo $status
+
+    #no multiallelics file for annotation: 
+    bcftools view -e'FILTER~"multiallelic"' ~{vcf_in} -Oz -o ~{sample_id}_~{prefix}_nomulti.vcf.gz
+    tabix -p vcf ~{sample_id}_~{prefix}_nomulti.vcf.gz
+
+
 
 
   >>>
