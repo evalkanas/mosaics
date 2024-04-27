@@ -67,8 +67,12 @@ task Qc {
     tabix -p vcf ~{sample_id}_~{prefix}_pass.vcf.gz
 
     #generate variants per chr file
-    echo -e "chr\t~{sample_id}" > ~{sample_id}_~{prefix}_pass_stats.txt
-    bcftools index -s ~{sample_id}_~{prefix}_pass.vcf.gz | awk '{print $1"\t"$3}' >> ~{sample_id}_~{prefix}_pass_stats.txt
+    echo -e "chr\tvariants\tsample_id" > ~{sample_id}_~{prefix}_pass_stats.txt
+    bcftools index -s ~{sample_id}_~{prefix}_pass.vcf.gz | awk -v sample_id=~{sample_id} '{print $1"\t"$3"\t"sample_id}' >> ~{sample_id}_~{prefix}_pass_stats.txt
+    
+    sum=`awk '{SUM+=$2}END{print SUM}' ~{sample_id}_~{prefix}_pass_stats.txt
+    echo -e "sum\t"${sum}"\t"~{sample_id} >> ~{sample_id}_~{prefix}_pass_stats.txt
+
 
     rm ~{sample_id}_~{prefix}_pass.vcf.gz*
 
