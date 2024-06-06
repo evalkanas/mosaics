@@ -129,7 +129,7 @@ task Anno {
     #remove mnp and large indels and multiallelics
     bcftools filter -e 'strlen(REF)==2 && strlen(ALT)==2' ~{sample_id}_~{prefix}_pre_pass.vcf.gz\
     | bcftools filter -e 'strlen(REF)>50'\
-    | bcftools filter -e 'FILTER~"multiallelic"'
+    | bcftools filter -e 'FILTER~"multiallelic"'\
     | bcftools filter -e 'strlen(ALT)>50'  -Oz -o ~{sample_id}_~{prefix}_pass.vcf.gz 
 
 
