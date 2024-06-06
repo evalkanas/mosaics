@@ -26,8 +26,6 @@ workflow AnnoSites {
     File bed_header #header with info for both bed files to add to output VCF
     File lcr
     File wes
-    File pass_af
-    File pass_af_idx
     File all_af
     File all_af_idx
     File simplerepeat
@@ -48,8 +46,6 @@ workflow AnnoSites {
       gc_bed_idx = gc_bed_idx, 
       lcr = lcr,
       wes = wes,
-      pass_af = pass_af,
-      pass_af_idx =pass_af_idx,
       all_af = all_af,
       all_af_idx = all_af_idx,
       simplerepeat = simplerepeat, 
@@ -82,8 +78,6 @@ task Anno {
     File bed_header
     File lcr
     File wes
-    File pass_af
-    File pass_af_idx
     File all_af
     File all_af_idx
     File simplerepeat
@@ -123,9 +117,7 @@ task Anno {
           | bcftools annotate -a ~{lcr} \
           -c CHROM,FROM,TO,-,-,- -m +LCR \
           | bcftools annotate -a ~{all_af} \
-          -c CHROM,POS,REF,ALT,all_cohort_ac,all_cohort_af,cohort_n \
-          | bcftools annotate -a ~{pass_af} \
-          -c CHROM,POS,REF,ALT,pass_cohort_ac,pass_cohort_af \
+          -c CHROM,POS,REF,ALT,all_cohort_ac,pass_cohort_ac,cohort_n,all_cohort_af,pass_cohort_af \
           -Oz -o ~{sample_id}_~{prefix}.vcf.gz
 
     tabix -p vcf ~{sample_id}_~{prefix}.vcf.gz
@@ -134,10 +126,12 @@ task Anno {
     bcftools view -f PASS ~{sample_id}_~{prefix}.vcf.gz -Oz -o ~{sample_id}_~{prefix}_pre_pass.vcf.gz
     tabix -p vcf ~{sample_id}_~{prefix}_pre_pass.vcf.gz
 
-    #remove mnp and large indels 
+    #remove mnp and large indels and multiallelics
     bcftools filter -e 'strlen(REF)==2 && strlen(ALT)==2' ~{sample_id}_~{prefix}_pre_pass.vcf.gz\
     | bcftools filter -e 'strlen(REF)>50'\
-    | bcftools filter -e 'strlen(ALT)>50'  -Oz -o ~{sample_id}_~{prefix}_pass.vcf.gz
+    | bcftools filter -e 'FILTER~"multiallelic"'
+    | bcftools filter -e 'strlen(ALT)>50'  -Oz -o ~{sample_id}_~{prefix}_pass.vcf.gz 
+
 
     tabix -p vcf ~{sample_id}_~{prefix}_pass.vcf.gz
  
